@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポーカーゲーム - ディーラー対戦</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .info-item {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .chips {
+            color: #27ae60;
+        }
+
+        .bet {
+            color: #e74c3c;
+        }
+
+        .player-area {
+            margin: 20px 0;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+
+        .player-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .dealer-title {
+            color: #e74c3c;
+        }
+
+        .player-title-player {
+            color: #3498db;
+        }
+
+        .hand-info {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            min-height: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        .cards-area {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            min-height: 160px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 90px;
+            height: 130px;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .card.back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: default;
+        }
+
+        .card.back::after {
+            content: '🃏';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+        }
+
+        .card:not(.back):hover {
+            transform: translateY(-10px);
+        }
+
+        .card.selected {
+            transform: translateY(-20px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.5);
+            border-color: #e74c3c;
+        }
+
+        .card.hearts, .card.diamonds {
+            color: #e74c3c;
+        }
+
+        .card.clubs, .card.spades {
+            color: #333;
+        }
+
+        .card-top, .card-bottom {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .card-bottom {
+            align-self: flex-end;
+            transform: rotate(180deg);
+        }
+
+        .card-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-deal {
+            background: #27ae60;
+        }
+
+        .btn-draw {
+            background: #3498db;
+        }
+
+        .btn-bet {
+            background: #f39c12;
+        }
+
+        .bet-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .bet-input {
+            padding: 10px;
+            font-size: 1.1em;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            width: 150px;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: #ecf0f1;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result.win {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .result.lose {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .result.draw {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .hands-reference {
+            margin-top: 30px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+
+        .hands-reference h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .hand-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .hand-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hand-name {
+            font-weight: bold;
+        }
+
+        .hand-rank {
+            color: #3498db;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🃏 ポーカーゲーム - ディーラー対戦 🃏</h1>
+        
+        <div class="game-info">
+            <div class="info-item">
+                チップ: <span class="chips" id="chips">1000</span>
+            </div>
+            <div class="info-item">
+                現在のベット: <span class="bet" id="currentBet">0</span>
+            </div>
+        </div>
+
+        <div class="bet-controls">
+            <input type="number" class="bet-input" id="betAmount" min="10" max="1000" value="10" step="10">
+            <button class="btn-bet" onclick="placeBet()">ベット</button>
+            <button class="btn-bet" onclick="quickBet(50)">50</button>
+            <button class="btn-bet" onclick="quickBet(100)">100</button>
+            <button class="btn-bet" onclick="quickBet(500)">500</button>
+        </div>
+
+        <div class="result" id="result">ベットしてディールボタンを押してください</div>
+
+        <div class="player-area">
+            <div class="player-title dealer-title">🎩 ディーラー</div>
+            <div class="hand-info" id="dealerHandInfo"></div>
+            <div class="cards-area" id="dealerCardsArea"></div>
+        </div>
+
+        <div class="player-area">
+            <div class="player-title player-title-player">👤 あなた</div>
+            <div class="hand-info" id="playerHandInfo"></div>
+            <div class="cards-area" id="playerCardsArea"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-deal" id="dealBtn" onclick="deal()" disabled>ディール</button>
+            <button class="btn-draw" id="drawBtn" onclick="draw()" disabled>ドロー（選択したカードを交換）</button>
+        </div>
+
+        <div class="hands-reference">
+            <h2>役一覧（強い順）</h2>
+            <div class="hand-list">
+                <div class="hand-item">
+                    <span class="hand-name">ロイヤルフラッシュ</span>
+                    <span class="hand-rank">最強</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">ストレートフラッシュ</span>
+                    <span class="hand-rank">9</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">フォーカード</span>
+                    <span class="hand-rank">8</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">フルハウス</span>
+                    <span class="hand-rank">7</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">フラッシュ</span>
+                    <span class="hand-rank">6</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">ストレート</span>
+                    <span class="hand-rank">5</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">スリーカード</span>
+                    <span class="hand-rank">4</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">ツーペア</span>
+                    <span class="hand-rank">3</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">ワンペア</span>
+                    <span class="hand-rank">2</span>
+                </div>
+                <div class="hand-item">
+                    <span class="hand-name">ハイカード</span>
+                    <span class="hand-rank">1</span>
+                </div>
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; text-align: center;">
+                <strong>配当:</strong> 勝利 = ベット額の2倍 | 引き分け = ベット額返却 | 敗北 = 没収
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+        const suitSymbols = {
+            'hearts': '♥',
+            'diamonds': '♦',
+            'clubs': '♣',
+            'spades': '♠'
+        };
+        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const rankValues = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14 };
+
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let chips = 1000;
+        let currentBet = 0;
+        let selectedCards = new Set();
+        let gamePhase = 'betting';
+
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let rank of ranks) {
+                    deck.push({ suit, rank });
+                }
+            }
+        }
+
+        function shuffle() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function drawCard() {
+            return deck.pop();
+        }
+
+        function placeBet() {
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            if (betAmount < 10) {
+                alert('最低ベット額は10チップです');
+                return;
+            }
+            if (betAmount > chips) {
+                alert('チップが足りません');
+                return;
+            }
+            currentBet = betAmount;
+            chips -= betAmount;
+            updateDisplay();
+            document.getElementById('dealBtn').disabled = false;
+            document.getElementById('result').textContent = 'ディールボタンを押してください';
+            document.getElementById('result').className = 'result';
+            gamePhase = 'betting';
+        }
+
+        function quickBet(amount) {
+            document.getElementById('betAmount').value = amount;
+            placeBet();
+        }
+
+        function deal() {
+            createDeck();
+            shuffle();
+            playerHand = [];
+            dealerHand = [];
+            selectedCards.clear();
+            
+            for (let i = 0; i < 5; i++) {
+                playerHand.push(drawCard());
+                dealerHand.push(drawCard());
+            }
+            
+            gamePhase = 'player_draw';
+            displayCards(true);
+            document.getElementById('dealBtn').disabled = true;
+            document.getElementById('drawBtn').disabled = false;
+            document.getElementById('result').textContent = '交換したいカードをクリックしてください（交換しない場合はそのままドロー）';
+            document.getElementById('result').className = 'result';
+            document.getElementById('playerHandInfo').textContent = '';
+            document.getElementById('dealerHandInfo').textContent = '';
+        }
+
+        function draw() {
+            const indicesToReplace = Array.from(selectedCards).sort((a, b) => b - a);
+            for (let index of indicesToReplace) {
+                playerHand[index] = drawCard();
+            }
+            selectedCards.clear();
+            
+            dealerDraw();
+            
+            gamePhase = 'showdown';
+            displayCards(false);
+            evaluateShowdown();
+            document.getElementById('drawBtn').disabled = true;
+            document.getElementById('dealBtn').disabled = false;
+        }
+
+        function dealerDraw() {
+            const playerResult = checkHand(playerHand);
+            const dealerResult = checkHand(dealerHand);
+            
+            let cardsToChange = [];
+            
+            if (dealerResult.rank < 4) {
+                const rankCounts = {};
+                dealerHand.forEach((card, idx) => {
+                    const rank = card.rank;
+                    if (!rankCounts[rank]) rankCounts[rank] = [];
+                    rankCounts[rank].push(idx);
+                });
+                
+                const pairs = Object.values(rankCounts).filter(arr => arr.length >= 2);
+                if (pairs.length > 0) {
+                    const keepIndices = new Set(pairs.flat());
+                    dealerHand.forEach((card, idx) => {
+                        if (!keepIndices.has(idx)) {
+                            cardsToChange.push(idx);
+                        }
+                    });
+                } else {
+                    const highCards = dealerHand
+                        .map((card, idx) => ({ card, idx, value: rankValues[card.rank] }))
+                        .sort((a, b) => b.value - a.value);
+                    
+                    for (let i = 2; i < 5; i++) {
+                        cardsToChange.push(highCards[i].idx);
+                    }
+                }
+            } else if (dealerResult.rank < 6) {
+                const randomCount = Math.floor(Math.random() * 2);
+                for (let i = 0; i < randomCount; i++) {
+                    let idx;
+                    do {
+                        idx = Math.floor(Math.random() * 5);
+                    } while (cardsToChange.includes(idx));
+                    cardsToChange.push(idx);
+                }
+            }
+            
+            for (let index of cardsToChange) {
+                dealerHand[index] = drawCard();
+            }
+        }
+
+        function toggleCardSelection(index) {
+            if (selectedCards.has(index)) {
+                selectedCards.delete(index);
+            } else {
+                selectedCards.add(index);
+            }
+            displayCards(true);
+        }
+
+        function displayCards(hideDealerCards) {
+            const playerArea = document.getElementById('playerCardsArea');
+            const dealerArea = document.getElementById('dealerCardsArea');
+            
+            playerArea.innerHTML = '';
+            dealerArea.innerHTML = '';
+            
+            playerHand.forEach((card, index) => {
+                const cardDiv = createCardElement(card, index, !hideDealerCards);
+                playerArea.appendChild(cardDiv);
+            });
+            
+            dealerHand.forEach((card, index) => {
+                const cardDiv = createCardElement(card, index, false, hideDealerCards);
+                dealerArea.appendChild(cardDiv);
+            });
+        }
+
+        function createCardElement(card, index, isPlayerCard, hideCard = false) {
+            const cardDiv = document.createElement('div');
+            
+            if (hideCard) {
+                cardDiv.className = 'card back';
+            } else {
+                cardDiv.className = `card ${card.suit}`;
+                if (isPlayerCard && selectedCards.has(index) && gamePhase === 'player_draw') {
+                    cardDiv.className += ' selected';
+                }
+                
+                if (isPlayerCard && gamePhase === 'player_draw') {
+                    cardDiv.onclick = () => toggleCardSelection(index);
+                }
+                
+                cardDiv.innerHTML = `
+                    <div class="card-top">
+                        <span>${card.rank}</span>
+                        <span>${suitSymbols[card.suit]}</span>
+                    </div>
+                    <div class="card-center">${suitSymbols[card.suit]}</div>
+                    <div class="card-bottom">
+                        <span>${card.rank}</span>
+                        <span>${suitSymbols[card.suit]}</span>
+                    </div>
+                `;
+            }
+            
+            return cardDiv;
+        }
+
+        function evaluateShowdown() {
+            const playerResult = checkHand(playerHand);
+            const dealerResult = checkHand(dealerHand);
+            const resultDiv = document.getElementById('result');
+            
+            document.getElementById('playerHandInfo').textContent = playerResult.name;
+            document.getElementById('dealerHandInfo').textContent = dealerResult.name;
+            
+            let winner;
+            if (playerResult.rank > dealerResult.rank) {
+                winner = 'player';
+            } else if (playerResult.rank < dealerResult.rank) {
+                winner = 'dealer';
+            } else {
+                const playerHighCard = getHighCard(playerHand);
+                const dealerHighCard = getHighCard(dealerHand);
+                if (playerHighCard > dealerHighCard) {
+                    winner = 'player';
+                } else if (playerHighCard < dealerHighCard) {
+                    winner = 'dealer';
+                } else {
+                    winner = 'draw';
+                }
+            }
+            
+            if (winner === 'player') {
+                const winnings = currentBet * 2;
+                chips += winnings;
+                resultDiv.textContent = `勝利！ ${winnings}チップ獲得！`;
+                resultDiv.className = 'result win';
+            } else if (winner === 'dealer') {
+                resultDiv.textContent = '敗北... ディーラーの勝ちです';
+                resultDiv.className = 'result lose';
+            } else {
+                chips += currentBet;
+                resultDiv.textContent = '引き分け！ ベット額を返却します';
+                resultDiv.className = 'result draw';
+            }
+            
+            currentBet = 0;
+            updateDisplay();
+        }
+
+        function getHighCard(hand) {
+            return Math.max(...hand.map(card => rankValues[card.rank]));
+        }
+
+        function checkHand(hand) {
+            const rankList = hand.map(c => c.rank);
+            const suitList = hand.map(c => c.suit);
+            const rankCounts = {};
+            const suitCounts = {};
+
+            rankList.forEach(r => rankCounts[r] = (rankCounts[r] || 0) + 1);
+            suitList.forEach(s => suitCounts[s] = (suitCounts[s] || 0) + 1);
+
+            const counts = Object.values(rankCounts).sort((a, b) => b - a);
+            const isFlush = Object.values(suitCounts).some(c => c === 5);
+            const sortedValues = rankList.map(r => rankValues[r]).sort((a, b) => a - b);
+            
+            let isStraight = true;
+            for (let i = 1; i < sortedValues.length; i++) {
+                if (sortedValues[i] !== sortedValues[i - 1] + 1) {
+                    isStraight = false;
+                    break;
+                }
+            }
+            
+            const isLowStraight = rankList.includes('A') && rankList.includes('2') && 
+                                  rankList.includes('3') && rankList.includes('4') && rankList.includes('5');
+            if (isLowStraight) isStraight = true;
+
+            const isRoyalFlush = isFlush && isStraight && 
+                               rankList.includes('A') && rankList.includes('K') && 
+                               rankList.includes('Q') && rankList.includes('J') && rankList.includes('10');
+
+            if (isRoyalFlush) return { name: 'ロイヤルフラッシュ', rank: 10 };
+            if (isFlush && isStraight) return { name: 'ストレートフラッシュ', rank: 9 };
+            if (counts[0] === 4) return { name: 'フォーカード', rank: 8 };
+            if (counts[0] === 3 && counts[1] === 2) return { name: 'フルハウス', rank: 7 };
+            if (isFlush) return { name: 'フラッシュ', rank: 6 };
+            if (isStraight) return { name: 'ストレート', rank: 5 };
+            if (counts[0] === 3) return { name: 'スリーカード', rank: 4 };
+            if (counts[0] === 2 && counts[1] === 2) return { name: 'ツーペア', rank: 3 };
+            if (counts[0] === 2) return { name: 'ワンペア', rank: 2 };
+            return { name: 'ハイカード', rank: 1 };
+        }
+
+        function updateDisplay() {
+            document.getElementById('chips').textContent = chips;
+            document.getElementById('currentBet').textContent = currentBet;
+            
+            if (chips < 10) {
+                alert('チップがなくなりました！ゲームをリセットします。');
+                chips = 1000;
+                updateDisplay();
+            }
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
