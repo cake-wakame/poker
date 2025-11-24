@@ -269,26 +269,47 @@
         }
 
         .hand-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .hand-item {
-            padding: 10px;
+            padding: 15px;
             background: white;
             border-radius: 5px;
+            border-left: 5px solid #3498db;
+        }
+
+        .hand-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 8px;
         }
 
         .hand-name {
             font-weight: bold;
+            font-size: 1.2em;
+            color: #1e3c72;
         }
 
         .hand-rank {
             color: #3498db;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .hand-description {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .hand-example {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
             font-weight: bold;
         }
     </style>
@@ -334,47 +355,116 @@
         </div>
 
         <div class="hands-reference">
-            <h2>役一覧（強い順）</h2>
+            <h2>役一覧と説明（強い順）</h2>
             <div class="hand-list">
                 <div class="hand-item">
-                    <span class="hand-name">ロイヤルフラッシュ</span>
-                    <span class="hand-rank">最強</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ロイヤルフラッシュ</span>
+                        <span class="hand-rank">最強</span>
+                    </div>
+                    <div class="hand-description">
+                        同じスート（マーク）の10、J、Q、K、Aが揃った状態。ポーカーの最強役で、出現確率は約0.00015%。
+                    </div>
+                    <div class="hand-example">例: ♠10 ♠J ♠Q ♠K ♠A</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">ストレートフラッシュ</span>
-                    <span class="hand-rank">9</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ストレートフラッシュ</span>
+                        <span class="hand-rank">9</span>
+                    </div>
+                    <div class="hand-description">
+                        同じスートで数字が連続している5枚のカード。ロイヤルフラッシュ以外の連続した同一スート。
+                    </div>
+                    <div class="hand-example">例: ♥5 ♥6 ♥7 ♥8 ♥9</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">フォーカード</span>
-                    <span class="hand-rank">8</span>
+                    <div class="hand-header">
+                        <span class="hand-name">フォーカード</span>
+                        <span class="hand-rank">8</span>
+                    </div>
+                    <div class="hand-description">
+                        同じ数字のカードが4枚揃った状態。別名「フォー・オブ・ア・カインド」。
+                    </div>
+                    <div class="hand-example">例: ♠7 ♥7 ♦7 ♣7 ♠K</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">フルハウス</span>
-                    <span class="hand-rank">7</span>
+                    <div class="hand-header">
+                        <span class="hand-name">フルハウス</span>
+                        <span class="hand-rank">7</span>
+                    </div>
+                    <div class="hand-description">
+                        スリーカード（3枚）とワンペア（2枚）の組み合わせ。同じ数字が3枚と別の数字が2枚。
+                    </div>
+                    <div class="hand-example">例: ♠9 ♥9 ♦9 ♣4 ♠4</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">フラッシュ</span>
-                    <span class="hand-rank">6</span>
+                    <div class="hand-header">
+                        <span class="hand-name">フラッシュ</span>
+                        <span class="hand-rank">6</span>
+                    </div>
+                    <div class="hand-description">
+                        5枚すべてが同じスート（マーク）のカード。数字は連続していなくてもよい。
+                    </div>
+                    <div class="hand-example">例: ♦2 ♦5 ♦8 ♦J ♦K</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">ストレート</span>
-                    <span class="hand-rank">5</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ストレート</span>
+                        <span class="hand-rank">5</span>
+                    </div>
+                    <div class="hand-description">
+                        5枚のカードの数字が連続している状態。スートはバラバラでもよい。A-2-3-4-5も認められる。
+                    </div>
+                    <div class="hand-example">例: ♠6 ♥7 ♦8 ♣9 ♠10</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">スリーカード</span>
-                    <span class="hand-rank">4</span>
+                    <div class="hand-header">
+                        <span class="hand-name">スリーカード</span>
+                        <span class="hand-rank">4</span>
+                    </div>
+                    <div class="hand-description">
+                        同じ数字のカードが3枚揃った状態。別名「スリー・オブ・ア・カインド」。
+                    </div>
+                    <div class="hand-example">例: ♠Q ♥Q ♦Q ♣3 ♠7</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">ツーペア</span>
-                    <span class="hand-rank">3</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ツーペア</span>
+                        <span class="hand-rank">3</span>
+                    </div>
+                    <div class="hand-description">
+                        異なる数字のペア（2枚組）が2組ある状態。例えば8のペアと3のペアなど。
+                    </div>
+                    <div class="hand-example">例: ♠J ♥J ♦5 ♣5 ♠2</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">ワンペア</span>
-                    <span class="hand-rank">2</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ワンペア</span>
+                        <span class="hand-rank">2</span>
+                    </div>
+                    <div class="hand-description">
+                        同じ数字のカードが2枚だけある状態。最も基本的な役で、出現頻度が高い。
+                    </div>
+                    <div class="hand-example">例: ♠A ♥A ♦8 ♣4 ♠2</div>
                 </div>
+
                 <div class="hand-item">
-                    <span class="hand-name">ハイカード</span>
-                    <span class="hand-rank">1</span>
+                    <div class="hand-header">
+                        <span class="hand-name">ハイカード</span>
+                        <span class="hand-rank">1</span>
+                    </div>
+                    <div class="hand-description">
+                        上記のどの役も成立していない状態。5枚の中で最も数字が大きいカードで勝負する。
+                    </div>
+                    <div class="hand-example">例: ♠K ♥10 ♦7 ♣5 ♠2（Kハイ）</div>
                 </div>
             </div>
             <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; text-align: center;">
