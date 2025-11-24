@@ -664,7 +664,7 @@
             dealerArea.innerHTML = '';
             
             playerHand.forEach((card, index) => {
-                const cardDiv = createCardElement(card, index, !hideDealerCards);
+                const cardDiv = createCardElement(card, index, true, false);
                 playerArea.appendChild(cardDiv);
             });
             
