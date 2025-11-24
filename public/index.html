@@ -325,6 +325,9 @@
             <div class="info-item">
                 現在のベット: <span class="bet" id="currentBet">0</span>
             </div>
+            <div class="info-item">
+                残り交換回数: <span class="chips" id="drawsLeft">3</span>
+            </div>
         </div>
 
         <div class="bet-controls">
@@ -491,6 +494,8 @@
         let currentBet = 0;
         let selectedCards = new Set();
         let gamePhase = 'betting';
+        let drawsRemaining = 3;
+        let maxDraws = 3;
 
         function createDeck() {
             deck = [];
@@ -542,6 +547,7 @@
             playerHand = [];
             dealerHand = [];
             selectedCards.clear();
+            drawsRemaining = maxDraws;
             
             for (let i = 0; i < 5; i++) {
                 playerHand.push(drawCard());
@@ -552,10 +558,12 @@
             displayCards(true);
             document.getElementById('dealBtn').disabled = true;
             document.getElementById('drawBtn').disabled = false;
+            updateDrawButtonText();
             document.getElementById('result').textContent = '交換したいカードをクリックしてください（交換しない場合はそのままドロー）';
             document.getElementById('result').className = 'result';
             document.getElementById('playerHandInfo').textContent = '';
             document.getElementById('dealerHandInfo').textContent = '';
+            updateDisplay();
         }
 
         function draw() {
@@ -564,14 +572,32 @@
                 playerHand[index] = drawCard();
             }
             selectedCards.clear();
+            drawsRemaining--;
             
-            dealerDraw();
-            
-            gamePhase = 'showdown';
-            displayCards(false);
-            evaluateShowdown();
-            document.getElementById('drawBtn').disabled = true;
-            document.getElementById('dealBtn').disabled = false;
+            if (drawsRemaining > 0) {
+                displayCards(true);
+                updateDrawButtonText();
+                document.getElementById('result').textContent = `交換したいカードをクリックしてください（残り${drawsRemaining}回）`;
+                document.getElementById('result').className = 'result';
+                updateDisplay();
+            } else {
+                dealerDraw();
+                
+                gamePhase = 'showdown';
+                displayCards(false);
+                evaluateShowdown();
+                document.getElementById('drawBtn').disabled = true;
+                document.getElementById('dealBtn').disabled = false;
+            }
+        }
+        
+        function updateDrawButtonText() {
+            const drawBtn = document.getElementById('drawBtn');
+            if (drawsRemaining > 0) {
+                drawBtn.textContent = `ドロー（残り${drawsRemaining}回）`;
+            } else {
+                drawBtn.textContent = 'ドロー';
+            }
         }
 
         function dealerDraw() {
@@ -770,6 +796,7 @@
         function updateDisplay() {
             document.getElementById('chips').textContent = chips;
             document.getElementById('currentBet').textContent = currentBet;
+            document.getElementById('drawsLeft').textContent = drawsRemaining;
             
             if (chips < 10) {
                 alert('チップがなくなりました！ゲームをリセットします。');
